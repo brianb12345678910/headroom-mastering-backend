@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Headroom Console</title>
+  <link rel="stylesheet" href="/static/console.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">HEADROOM <span>mix + master console</span></div>
+
+    <div class="transport" role="group" aria-label="Transport">
+      <button id="btn-rewind" class="tbtn" title="Back to start (Home)" aria-label="Back to start">&#9198;</button>
+      <button id="btn-play" class="tbtn play" title="Play / pause (Space)" aria-label="Play">&#9654;</button>
+      <button id="btn-stop" class="tbtn" title="Stop" aria-label="Stop">&#9632;</button>
+      <button id="btn-loop" class="tbtn toggle" title="Loop" aria-pressed="false">LOOP</button>
+      <div class="clock" id="clock">0:00.0 / 0:00.0</div>
+    </div>
+
+    <div class="file-actions">
+      <label class="btn primary" title="Add audio files as new channels">
+        + Add tracks
+        <input id="file-input" type="file" accept="audio/*,.wav,.mp3,.flac,.ogg,.m4a,.aif,.aiff" multiple hidden>
+      </label>
+      <button id="btn-demo" class="btn">Load demo song</button>
+      <button id="btn-save" class="btn" title="Save all knob and fader settings as JSON">Save mix</button>
+      <label class="btn" title="Load mix settings JSON">
+        Load mix
+        <input id="settings-input" type="file" accept="application/json,.json" hidden>
+      </label>
+    </div>
+  </header>
+
+  <section class="timeline-wrap">
+    <canvas id="timeline" height="120" aria-label="Arrangement overview. Click to seek."></canvas>
+    <div id="dropzone" class="dropzone">Drop audio files anywhere to add channels &mdash; or load the demo song</div>
+  </section>
+
+  <main class="desk">
+    <div id="channels" class="channels" aria-label="Channel strips"></div>
+    <div id="buses" class="buses"></div>
+  </main>
+
+  <section class="export" aria-label="Bounce and master">
+    <div class="export-col">
+      <h2>Bounce</h2>
+      <p class="hint">Renders the full mix through every channel and the master bus, faster than real time.</p>
+      <div class="row">
+        <label>Bit depth
+          <select id="bounce-depth">
+            <option value="24" selected>24-bit</option>
+            <option value="16">16-bit</option>
+          </select>
+        </label>
+        <button id="btn-bounce" class="btn primary">Bounce mix to WAV</button>
+      </div>
+      <div class="row">
+        <label>Loudness target
+          <select id="target-lufs">
+            <option value="-14" selected>-14 LUFS &middot; Spotify / YouTube</option>
+            <option value="-16">-16 LUFS &middot; Apple Music</option>
+            <option value="-11">-11 LUFS &middot; loud pop / EDM</option>
+            <option value="-9">-9 LUFS &middot; club</option>
+            <option value="-23">-23 LUFS &middot; broadcast (EBU R128)</option>
+          </select>
+        </label>
+        <button id="btn-match" class="btn" title="Adjusts the master limiter drive until the bounce hits the target">Match target</button>
+      </div>
+      <div id="bounce-status" class="status" role="status"></div>
+    </div>
+
+    <div class="export-col">
+      <h2>Server master</h2>
+      <p class="hint">Sends the bounce to the backend for console coloration and two-pass EBU R128 loudness normalization (ffmpeg).</p>
+      <div class="row">
+        <label>Console
+          <select id="server-console"><option value="none">Clean</option></select>
+        </label>
+        <label>Target
+          <input id="server-lufs" type="number" min="-30" max="-5" step="0.5" value="-14"> LUFS
+        </label>
+        <label>Ceiling
+          <input id="server-tp" type="number" min="-9" max="0" step="0.1" value="-1"> dBTP
+        </label>
+        <label>Width
+          <input id="server-width" type="number" min="0" max="2" step="0.05" value="1">
+        </label>
+      </div>
+      <p id="console-desc" class="hint small"></p>
+      <div class="row">
+        <button id="btn-server-master" class="btn primary">Master on server</button>
+      </div>
+      <div id="server-status" class="status" role="status"></div>
+      <div id="ab" class="ab" hidden>
+        <div><span class="ab-label">A &middot; Mix</span><audio id="audio-a" controls></audio></div>
+        <div><span class="ab-label">B &middot; Master</span><audio id="audio-b" controls></audio></div>
+        <a id="download-master" class="btn primary" download>Download master</a>
+      </div>
+    </div>
+  </section>
+
+
+  <script src="/static/console.js" type="module"></script>
+</body>
+</html>
